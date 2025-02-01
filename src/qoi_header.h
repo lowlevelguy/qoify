@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define FILE_NO_READ_PERM 				0
-#define FILE_NO_WRITE_PERM 				0
-#define QOI_HEADER_CHANNELS_INVALID 	-1
-#define QOI_HEADER_COLORSPACE_INVALID 	-2
+#define FILE_READ_ERROR 				0
+#define FILE_WRITE_ERROR				-1
+#define QOI_HEADER_CHANNELS_INVALID 	-2
+#define QOI_HEADER_COLORSPACE_INVALID 	-3
 
 enum {
 	QOI_HEADER_CHANNELS_RGB = 3,

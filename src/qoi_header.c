@@ -8,18 +8,18 @@ int read_qoi_header(FILE* f, qoi_header* qh) {
 
 	// get magic bytes
 	if (fread(qh->magic, 4, 1, f) == 0) {
-		return FILE_NO_READ_PERM;
+		return FILE_READ_ERROR;
 	}
 
 	// get width and height
 	if (fread(&qh->width, 4, 1, f) == 0 || fread(&qh->height, 4, 1, f) == 0) {
-		return FILE_NO_READ_PERM;
+		return FILE_READ_ERROR;
 	}
 
 	// get channels
 	uint8_t ch;
 	if (fread(&ch, 1, 1, f) == 0) {
-		return FILE_NO_READ_PERM;
+		return FILE_READ_ERROR;
 	}
 	if (ch != QOI_HEADER_CHANNELS_RGB && ch != QOI_HEADER_CHANNELS_RGBA) {
 		return QOI_HEADER_CHANNELS_INVALID;
@@ -29,7 +29,7 @@ int read_qoi_header(FILE* f, qoi_header* qh) {
 	// get colorspace
 	uint8_t cs;
 	if (fread(&cs, 1, 1, f) == 0) {
-		return FILE_NO_READ_PERM;
+		return FILE_READ_ERROR;
 	}
 	if (cs != QOI_HEADER_COLORSPACE_SRGB && cs != QOI_HEADER_COLORSPACE_LINEAR) {
 		return QOI_HEADER_COLORSPACE_INVALID;
@@ -46,12 +46,12 @@ int write_qoi_header(FILE* f, uint32_t width, uint32_t height, uint8_t channels,
 
 	// write magic bytes
 	if (fwrite("qoif", 4, 1, f) == 0) {
-		return FILE_NO_WRITE_PERM;
+		return FILE_WRITE_ERROR;
 	}
 	
 	// write width and height 
 	if (fwrite(&width, 4, 1, f) == 0 || fwrite(&height, 4, 1, f) == 0) {
-		return FILE_NO_WRITE_PERM;
+		return FILE_WRITE_ERROR;
 	}
 
 	// check then write channels
@@ -59,7 +59,7 @@ int write_qoi_header(FILE* f, uint32_t width, uint32_t height, uint8_t channels,
 		return 	QOI_HEADER_CHANNELS_INVALID;
 	}
 	if (fwrite(&channels, 1, 1, f) == 0) {
-		return FILE_NO_WRITE_PERM;
+		return FILE_WRITE_ERROR;
 	}
 
 	// check then write colorspace
@@ -67,7 +67,7 @@ int write_qoi_header(FILE* f, uint32_t width, uint32_t height, uint8_t channels,
 		return QOI_HEADER_COLORSPACE_INVALID;
 	}
 	if (fwrite(&colorspace, 1, 1, f) == 0) {
-		return FILE_NO_WRITE_PERM;
+		return FILE_WRITE_ERROR;
 	}
 
 	return 1;
