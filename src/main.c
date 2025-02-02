@@ -6,10 +6,17 @@
 
 int main (int argc, char** argv) {
 	if (argc < 4) {
-		printf("Usage: qoify [mode] input output\n\n"
-			   "Modes:\n"
-			   "\t-d\tdecode\n"
-			   "\t-e\tencode\n");
+		printf(
+		    "qoify - Convert between RAW and QOI image formats\n\n"
+		    "Usage: qoify [mode] input output\n\n"
+		    "Modes:\n"
+		    "  -d    Decode QOI file to RAW format\n"
+		    "  -e    Encode RAW file to QOI format\n\n"
+		    "Examples:\n"
+		    "  qoify -e image.raw image.qoi    # Encode RAW to QOI\n"
+		    "  qoify -d image.qoi image.raw    # Decode QOI to RAW\n\n"
+		    "Note: RAW files must be uncompressed RGB/RGBA data\n"
+		);
 		return -1;
 	}
 	if (strncmp("-d", argv[1], 2) == 0) {
