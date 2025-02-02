@@ -2,7 +2,7 @@
 
 typedef struct {
 	int errcode;
-	char* msg;
+	const char* msg;
 } errmsg;
 
-extern errmsg errs_qoi_header[];
+const char* errmsg_qoi_header(int errcode);

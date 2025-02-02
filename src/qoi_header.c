@@ -1,7 +1,6 @@
 #include "qoi_header.h"
 
-// returns 1 on success
-// otherwise, returns 0 or negative number that indicates the type of error that occured
+/* Returns 0 on success, negative number on failure */
 int read_qoi_header(FILE* f, qoi_header* qh) {
 	// set file position to file's beginning
 	fseek(f, 0, SEEK_SET);
@@ -36,10 +35,10 @@ int read_qoi_header(FILE* f, qoi_header* qh) {
 	}
 	qh->colorspace = cs;
 
-	return 1;
+	return 0;
 }
 
-// same return values as read_qoi_header
+/* Returns 0 on success, negative number on failure */
 int write_qoi_header(FILE* f, uint32_t width, uint32_t height, uint8_t channels, uint8_t colorspace) {
 	// set file position to file's beginning
 	fseek(f, 0, SEEK_SET);
@@ -70,5 +69,5 @@ int write_qoi_header(FILE* f, uint32_t width, uint32_t height, uint8_t channels,
 		return FILE_WRITE_ERROR;
 	}
 
-	return 1;
+	return 0;
 }
