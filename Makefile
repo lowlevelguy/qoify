@@ -3,10 +3,10 @@ SRCDIR=src
 CFLAGS=-I$(SRCDIR) -g -DDEBUG_MODEc -Wall
 
 ODIR=obj
-_OBJ=main.o qoi_header.o qoi_encode.o qoi_decode.o errmsg.o
+_OBJ=main.o qoi_header.o qoi_encode.o qoi_decode.o errmsg.o qoi_channels.o
 OBJ=$(patsubst %,$(ODIR)/%,$(_OBJ))
 
-_DEPS=qoi_header.h qoi_decode.h qoi_encode.h errmsg.h
+_DEPS=qoi_header.h qoi_decode.h qoi_encode.h errmsg.h qoi_operations.h qoi_channels.h
 DEPS=$(patsubst %,$(SRCDIR)/%,$(_DEPS))
 
 $(ODIR)/%.o: $(SRCDIR)/%.c $(DEPS)
