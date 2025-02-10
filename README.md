@@ -2,6 +2,12 @@
 
 Quite OK Image (QOI) format CLI encoder/decoder to and from RAW images.
 
+## Building
+```
+$ make
+```
+P.S.: If you're using a compiler other than `gcc`, make sure to modify the `Makefile` accordingly. The program also uses `getopt`, so it will not work on Windows.
+
 ## Usage
 Note: the program isn't yet actually usable, i.e. it will execute, but it won't be doing much of anything.
 
