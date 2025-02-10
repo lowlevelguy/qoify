@@ -7,16 +7,19 @@ Note: the program isn't yet actually usable, i.e. it will execute, but it won't 
 
 ```
 qoify - Convert between RAW and QOI image formats
-
-Usage: qoify [mode] input output
-
-Modes:
-  -d    Decode QOI file to RAW format
-  -e    Encode RAW file to QOI format
-
+Usage:
+  Encode: qoify -e --width <w> --height <h> [--no-alpha] input output
+  Decode: qoify -d input output
+Options:
+  -d, --decode       Decode QOI file to RAW format
+  -e, --encode       Encode RAW file to QOI format
+  -w, --width <n>    Width of input image (required for encoding)
+  -h, --height <n>   Height of input image (required for encoding)
+      --no-alpha     Input image is RGB (no alpha channel)
+      --help         Display this help message
 Examples:
-  qoify -e image.raw image.qoi    # Encode RAW to QOI
-  qoify -d image.qoi image.raw    # Decode QOI to RAW
-
+  qoify -e -w 800 -h 600 input.raw output.qoi     # Encode RGBA RAW to QOI
+  qoify -e -w 800 -h 600 --no-alpha in.raw out.qoi    # Encode RGB RAW to QOI
+  qoify -d image.qoi image.raw                     # Decode QOI to RAW
 Note: RAW files must be uncompressed RGB/RGBA data
 ```

@@ -1,3 +1,5 @@
+#include <arpa/inet.h>
+
 #include "qoi_header.h"
 
 /* Returns 0 on success, negative number on failure */
@@ -48,8 +50,10 @@ int write_qoi_header(FILE* f, uint32_t width, uint32_t height, uint8_t channels,
 		return FILE_WRITE_ERROR;
 	}
 	
-	// write width and height 
-	if (fwrite(&width, 4, 1, f) == 0 || fwrite(&height, 4, 1, f) == 0) {
+	// write width and height, both in big-endian encoding
+	uint32_t be_width = htonl(width);
+	uint32_t be_height = htonl(height);
+	if (fwrite(&be_width, 4, 1, f) == 0 || fwrite(&be_height, 4, 1, f) == 0) {
 		return FILE_WRITE_ERROR;
 	}
 

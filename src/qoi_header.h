@@ -26,4 +26,4 @@ typedef struct {
 } qoi_header;
 
 int read_qoi_header(FILE* f, qoi_header* qh);
-int write_qoi_header(FILE* f, uint32_t widht, uint32_t height, uint8_t channels, uint8_t colorspace);
+int write_qoi_header(FILE* f, uint32_t width, uint32_t height, uint8_t channels, uint8_t colorspace);
