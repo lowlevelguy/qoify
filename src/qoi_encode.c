@@ -55,12 +55,16 @@ void qoi_encode_rgba(char* in_path, char* out_path, uint32_t width, uint32_t hei
 			
 			if (memcmp(&current_px, &prev_px, 4) == 0) {
 				run++;
-				if (run == 63) {
-					write_chunk[write_chunk_sz++] = QOI_OP_RUN(run);	
+				// The run length is encoded over 6 bits with a bias of -1
+				// The values 63 and 64 are illegal, since they would be
+				// encoded as 0b111110 and 0b111111 respectively, which would
+				// conflict with the 8-bit tag for RGB and RGBA sequences.
+				if (run == 62) {
+					write_chunk[write_chunk_sz++] = QOI_OP_RUN(run-1);
 					run = 0;
 				}
 			} else if (run > 0) {
-				write_chunk[write_chunk_sz++] = QOI_OP_RUN(run);
+				write_chunk[write_chunk_sz++] = QOI_OP_RUN(run-1);
 				run = 0;
 			} else {
 				index = (3 * current_px.r + 5 * current_px.g + 7 * current_px.b + 11 * current_px.a) % 64;
