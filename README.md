@@ -3,10 +3,12 @@
 Quite OK Image (QOI) format CLI encoder/decoder to and from RAW images.
 
 ## Building
+To build the project, simply run:
 ```
 make
 ```
-P.S.: If you're using a compiler other than `gcc`, make sure to modify the `Makefile` accordingly. The program also uses `getopt`, so it will not work on Windows.
+The binary will be generated in the project root folder and will be called `qoify`.
+P.S.: If you're using a compiler other than `gcc`, make sure to modify the `Makefile` accordingly. The program also makes use of `getopt`, so it will not work on Windows. At least not until I replace it with a purely C-standard-based logic.
 
 ## Usage
 ```
@@ -29,9 +31,8 @@ Note: RAW files must be uncompressed RGB/RGBA data
 ```
 
 ## Testing
-For now, since the decoder logic is not yet implemented, I test by viewing the RAW and encoded QOI images in online viewers.
-
-Another possible way would be to use the encoder from the [official repo](https://github.com/phoboslab/qoi) and compares the hashes of its and my outputs.
+For now, since the decoder logic is not yet implemented, I test by viewing the input RAW and output QOI images in online viewers.
+Another possible way would be to use the encoder from the [official repo](https://github.com/phoboslab/qoi) and compare the hashes of its and my outputs.
 
 Once the decoder logic is implemented though, it will be possible to simply encode then decode an image, and check that its unchanged.
 
