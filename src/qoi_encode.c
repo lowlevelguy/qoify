@@ -69,22 +69,32 @@ void qoi_encode_rgba(char* in_path, char* out_path, uint32_t width, uint32_t hei
 					write_chunk[write_chunk_sz++] = QOI_OP_RUN(run-1);
 					run = 0;
 				}
-			} else if (run > 0) {
-				write_chunk[write_chunk_sz++] = QOI_OP_RUN(run-1);
-				run = 0;
-			} else {
-				index = (3 * current_px.r + 5 * current_px.g + 7 * current_px.b + 11 * current_px.a) % 64;
+			}
 
+			// If the current pixel differs from the previous
+			else {
+				if (run > 0) {
+					write_chunk[write_chunk_sz++] = QOI_OP_RUN(run-1);
+					run = 0;
+				}
+				
+				index = (3 * current_px.r + 5 * current_px.g + 7 * current_px.b + 11 * current_px.a) % 64;
+	
 				// Try: previously-seen pixel index encoding
-				if (memcmp(&seen_px[index], &current_px, 4) == 0) {
+				if (seen_px[index].r == current_px.r &&
+					seen_px[index].g == current_px.g &&
+					seen_px[index].b == current_px.b &&
+					seen_px[index].a == current_px.a) {
+
 					write_chunk[write_chunk_sz++] = QOI_OP_INDEX(index);
+
 				} else {
 					seen_px[index] = current_px;
 					
 					int8_t dr = current_px.r - prev_px.r,
 						   dg = current_px.g - prev_px.g,
 						   db = current_px.b - prev_px.b;
-	
+		
 					if (current_px.a == prev_px.a) {
 						if (dr >= -2 && dr <= 1 &&
 							dg >= -2 && dg <= 1 &&
@@ -93,25 +103,25 @@ void qoi_encode_rgba(char* in_path, char* out_path, uint32_t width, uint32_t hei
 							// As a result, they're all stored as unsigned values
 							write_chunk[write_chunk_sz++] = QOI_OP_DIFF(dr+2, dg+2, db+2);
 						}
-	
+		
 						// Try: LUMA encoding
 						else if (dg >= -32 && dg <= 31 &&
 								 dr-dg >= -8 && dr-dg <= 7 &&
 								 db-dg >= -8 && db-dg <= 7) {
-	
+		
 							// Write to file if there are no 2 free bytes
 							if (write_chunk_sz >= MAX_CHUNK_SIZE-2) {
 								fwrite(write_chunk, 1, write_chunk_sz, out);
 								write_chunk_sz = 0;
 							}
-	
+		
 							// The green difference is encoded with a bias of 32
 							// While red and blue are encoded with a bias of 8
 							uint8_t bytes[] = QOI_OP_LUMA(dr+8, dg+32, db+8);
 							write_chunk[write_chunk_sz++] = bytes[0];
 							write_chunk[write_chunk_sz++] = bytes[1];
 						}
-	
+		
 						// If all fails, but the alpha still matches, use RGB encoding
 						else {
 							// Write to file if there are no 4 free bytes
@@ -119,7 +129,7 @@ void qoi_encode_rgba(char* in_path, char* out_path, uint32_t width, uint32_t hei
 								fwrite(write_chunk, 1, write_chunk_sz, out);
 								write_chunk_sz = 0;
 							}
-	
+		
 							write_chunk[write_chunk_sz++] = QOI_OP_RGB_TAG;
 							write_chunk[write_chunk_sz++] = current_px.r;
 							write_chunk[write_chunk_sz++] = current_px.g;
@@ -134,16 +144,16 @@ void qoi_encode_rgba(char* in_path, char* out_path, uint32_t width, uint32_t hei
 							fwrite(write_chunk, 1, write_chunk_sz, out);
 							write_chunk_sz = 0;
 						}
-	
+		
 						write_chunk[write_chunk_sz++] = QOI_OP_RGBA_TAG;
 						write_chunk[write_chunk_sz++] = current_px.r;
 						write_chunk[write_chunk_sz++] = current_px.g;
 						write_chunk[write_chunk_sz++] = current_px.b;
 						write_chunk[write_chunk_sz++] = current_px.a;
 					}
-
 				}
 			}
+		
 
 			// Write to file when write_chunk is full
 			if (write_chunk_sz == MAX_CHUNK_SIZE) {
