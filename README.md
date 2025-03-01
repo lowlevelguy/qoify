@@ -30,7 +30,7 @@ Examples:
 Note: RAW files must be uncompressed RGB/RGBA data
 ```
 
-##Testing
+## Testing
 For now, since the decoder logic is not yet implemented, I test by viewing the RAW and encoded QOI images in online viewers.
 
 Another possible way would be to use the encoder from the [official repo](https://github.com/phoboslab/qoi) and compares the hashes of its and my outputs.
