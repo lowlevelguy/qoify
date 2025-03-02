@@ -1,6 +1,6 @@
 CC=gcc
 SRCDIR=src
-CFLAGS=-I$(SRCDIR) -g -DDEBUG_MODEc -Wall
+CFLAGS=-I$(SRCDIR) -g -DDEBUG_MODEc -Wall -fsanitize=address
 
 ODIR=obj
 _OBJ=main.o qoi_header.o qoi_encode.o qoi_decode.o errmsg.o qoi_channels.o

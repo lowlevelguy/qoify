@@ -9,7 +9,7 @@
 #include "qoi_operations.h"
 #include "errmsg.h"
 
-#define MAX_CHUNK_SIZE 4096
+#define MAX_CHUNK_SIZE 1024
 
 void qoi_encode(char* in_path, char* out_path, uint32_t width, uint32_t height, uint8_t has_alpha) {
 	if (has_alpha)
@@ -76,6 +76,11 @@ void qoi_encode_rgba(char* in_path, char* out_path, uint32_t width, uint32_t hei
 				if (run > 0) {
 					write_chunk[write_chunk_sz++] = QOI_OP_RUN(run-1);
 					run = 0;
+
+					if (write_chunk_sz == MAX_CHUNK_SIZE) {
+						fwrite(write_chunk, 1, write_chunk_sz, out);
+						write_chunk_sz = 0;
+					}
 				}
 				
 				index = (3 * current_px.r + 5 * current_px.g + 7 * current_px.b + 11 * current_px.a) % 64;
@@ -166,8 +171,10 @@ void qoi_encode_rgba(char* in_path, char* out_path, uint32_t width, uint32_t hei
 	}
 
 	// Write remaining run-length data if it exists
-	if (run > 0)
-		write_chunk[write_chunk_sz++] = QOI_OP_RUN(run-1);
+	if (run > 0) {
+		uint8_t byte = QOI_OP_RUN(run-1);
+		fwrite(&byte, 1, 1, out);
+	}
 
 	// Write remaining data in write_chunk to file if it exists
 	if (write_chunk_sz > 0)
