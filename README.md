@@ -1,14 +1,15 @@
 # QOIfy
 
-Quite OK Image (QOI) format CLI encoder/decoder to and from RAW images.
+Quite OK Image (QOI) format CLI encoder/decoder from and to raw RGB/RGBA images with 8-bit color depths.
 
 ## Building
 To build the project, simply run:
 ```
 make
 ```
-The binary will be generated in the project root folder and will be called `qoify`.
-P.S.: If you're using a compiler other than `gcc`, make sure to modify the `Makefile` accordingly. The program also makes use of `getopt`, so it will not work on Windows. At least not until I replace it with a purely C-standard-based logic.
+The binary will then be generated in the project root folder with the name `qoify`.
+
+P.S.: If you're using a compiler other than `gcc`, make sure to modify the `Makefile` accordingly. The program also makes use of [the POSIX-exclusive `getopt()` function](https://man7.org/linux/man-pages/man3/getopt.3.html), so it will not work on Windows; at least not until I replace it with a purely libc-based logic.
 
 ## Usage
 ```
