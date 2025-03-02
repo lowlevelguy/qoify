@@ -13,7 +13,7 @@
 #define QOI_OP_DIFF(dr,dg,db) 	(uint8_t)(((((dr) & 0x03) << 4) | (((dg) & 0x03) << 2) | ((db) & 0x03)) | 0x40)
 
 /* QOI luma operation: Encodes color difference using green as reference */
-#define QOI_OP_LUMA(dr,dg,db)	{ ((dg) & 0x3f) | 0x80, ((((dr) - (dg)) & 0x0f) << 4) | (((db) - (dg)) & 0x0f) }
+#define QOI_OP_LUMA(dr,dg,db)	{ (uint8_t)(((dg) & 0x3f) | 0x80), (uint8_t)(((((dr) - (dg)) & 0x0f) << 4) | (((db) - (dg)) & 0x0f)) }
 
 /* QOI run-length operation: Encodes repeated pixel runs */
 #define QOI_OP_RUN(x)			(uint8_t)(((x) & 0x3f) | 0xc0)

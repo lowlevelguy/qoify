@@ -9,7 +9,7 @@
 #include "qoi_operations.h"
 #include "errmsg.h"
 
-#define MAX_CHUNK_SIZE 1024
+#define MAX_CHUNK_SIZE 4096
 
 void qoi_encode(char* in_path, char* out_path, uint32_t width, uint32_t height, uint8_t has_alpha) {
 	if (has_alpha)
