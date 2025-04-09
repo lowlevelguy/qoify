@@ -1,7 +1,5 @@
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
-#include <arpa/inet.h>
 
 #include "qoi_encode.h"
 #include "qoi_channels.h"

@@ -6,7 +6,7 @@
 #include "qoi_decode.h"
 #include "qoi_encode.h"
 
-void print_usage() {
+void print_usage(void) {
     printf(
         "qoify - Convert between RAW and QOI image formats\n\n"
         "Usage:\n"
