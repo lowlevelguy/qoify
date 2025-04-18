@@ -42,9 +42,11 @@ void qoi_decode_rgba(char* in_path, char* out_path) {
 			if (read_chunk[i] == QOI_OP_RGBA_TAG) {
 				// If we detect an RGBA operation that has been split over two chunkered
 				// reads, we simply retreat the cursor to right before the operation and
-				// skip to the next chunkered read
-				if (i >= read_chunk_sz-sizeof(rgba_t)) {
-					fseek(in, -sizeof(rgba_t), SEEK_CUR);
+				// skip to the next chunkered read.
+				// For a given index i, the number of elements left until the end of the
+				// read_chunk array (element of index i included) is: read_chunk_sz - i.
+				if (i >= read_chunk_sz - sizeof(rgba_t)) {
+					fseek(in, -(read_chunk_sz - i), SEEK_CUR);
 					break;
 				}
 
@@ -54,8 +56,8 @@ void qoi_decode_rgba(char* in_path, char* out_path) {
 			
 			else if (read_chunk[i] == QOI_OP_RGB_TAG) {
 				// Same bound checking as for RGBA
-				if (i >= read_chunk_sz-3) {
-					fseek(out, -3, SEEK_CUR);
+				if (i >= read_chunk_sz - sizeof(rgb_t)) {
+					fseek(out, -(read_chunk_sz - i), SEEK_CUR);
 					break;
 				}
 				
