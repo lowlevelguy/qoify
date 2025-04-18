@@ -102,9 +102,8 @@ void qoi_encode_rgba(char* in_path, char* out_path, uint32_t width, uint32_t hei
 						if (dr >= -2 && dr <= 1 &&
 							dg >= -2 && dg <= 1 &&
 							db >= -2 && db <= 1) {
-							// The differences are encoded with a bias of 2
-							// As a result, they're all stored as unsigned values
-							write_chunk[write_chunk_sz++] = QOI_OP_DIFF(dr+2, dg+2, db+2);
+							
+							write_chunk[write_chunk_sz++] = QOI_OP_DIFF(dr, dg, db);
 						}
 		
 						// Try: LUMA encoding
@@ -118,9 +117,7 @@ void qoi_encode_rgba(char* in_path, char* out_path, uint32_t width, uint32_t hei
 								write_chunk_sz = 0;
 							}
 		
-							// The green difference is encoded with a bias of 32
-							// While red and blue are encoded with a bias of 8
-							uint8_t bytes[] = QOI_OP_LUMA(dr+8, dg+32, db+8);
+							uint8_t bytes[] = QOI_OP_LUMA(dr, dg, db);
 							write_chunk[write_chunk_sz++] = bytes[0];
 							write_chunk[write_chunk_sz++] = bytes[1];
 						}
@@ -270,9 +267,8 @@ void qoi_encode_rgb(char* in_path, char* out_path, uint32_t width, uint32_t heig
 					if (dr >= -2 && dr <= 1 &&
 						dg >= -2 && dg <= 1 &&
 						db >= -2 && db <= 1) {
-						// The differences are encoded with a bias of 2
-						// As a result, they're all stored as unsigned values
-						write_chunk[write_chunk_sz++] = QOI_OP_DIFF(dr+2, dg+2, db+2);
+						
+						write_chunk[write_chunk_sz++] = QOI_OP_DIFF(dr, dg, db);
 					}
 		
 					// Try: LUMA encoding
@@ -286,9 +282,7 @@ void qoi_encode_rgb(char* in_path, char* out_path, uint32_t width, uint32_t heig
 							write_chunk_sz = 0;
 						}
 		
-						// The green difference is encoded with a bias of 32
-						// While red and blue are encoded with a bias of 8
-						uint8_t bytes[] = QOI_OP_LUMA(dr+8, dg+32, db+8);
+						uint8_t bytes[] = QOI_OP_LUMA(dr, dg, db);
 						write_chunk[write_chunk_sz++] = bytes[0];
 						write_chunk[write_chunk_sz++] = bytes[1];
 					}
