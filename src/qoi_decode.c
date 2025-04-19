@@ -10,15 +10,7 @@
 
 #define MAX_CHUNK_SIZE 1024
 
-void qoi_decode(char* in_path, char* out_path, int alpha) {
-	if (alpha) {
-		qoi_decode_rgba(in_path, out_path);
-	} else {
-		qoi_decode_rgb(in_path, out_path);
-	}
-}
-
-void qoi_decode_rgba(char* in_path, char* out_path) {
+void qoi_decode (char* in_path, char* out_path) {
 	FILE* in = fopen(in_path, "rb"), *out = fopen(out_path, "wb");
 	if (in == NULL || out == NULL) {
 		printf("Error occured when trying to open `%s` in read mode and/or `%s` in write mode.\n",
@@ -33,6 +25,14 @@ void qoi_decode_rgba(char* in_path, char* out_path) {
 		return;
 	}
 
+	if (qh.channels == 4) {
+		qoi_decode_rgba(in, out);
+	} else {
+		qoi_decode_rgb(in, out);
+	}
+}
+
+void qoi_decode_rgba (FILE* in, FILE* out) {
 	uint8_t read_chunk[MAX_CHUNK_SIZE], dr, dg, db, dr_dg, db_dg;
 	rgba_t seen_px[64], write_chunk[MAX_CHUNK_SIZE], prev_px = QOI_COLOR_RGBA_BLACK;
 	size_t read_chunk_sz = 0, write_chunk_sz = 0, run_length = 0, index;
@@ -49,7 +49,12 @@ void qoi_decode_rgba(char* in_path, char* out_path) {
 					fseek(in, -(read_chunk_sz - i), SEEK_CUR);
 					break;
 				}
-				
+	
+				// If we detect two consecutive zeroes, notice that only two possibilities
+				// exist that are specification-compliant: either it's the end marker bytes,
+				// or they are within an RGBA/RGB operation.
+				// The latter are processed simultaneously when an RGBA/RGB tag is detected,
+				// so the only remaining possibility is the latter.
 				if (read_chunk[i+1] == 0)
 					goto end_marker_check;
 			}
@@ -124,14 +129,14 @@ void qoi_decode_rgba(char* in_path, char* out_path) {
 					// 	- 0x3f = 0b00111111
 					// 	- 0xf0 = 0b11110000
 					// 	- 0x0f = 0b00001111
+					//
+					// The differences dr and db are with a bias of +8, while dg of +32.
 					dg = (read_chunk[i++] & 0x3f) - 32;
 					dr_dg = ((read_chunk[i] & 0xf0) >> 4) - 8;
 					db_dg = (read_chunk[i] & 0x0f) - 8;
 
-					// The differences dr and db are with a bias of +8, while dg of +32.
 					dr = dr_dg + dg;
 					db = db_dg + dg;
-
 				}
 				
 				write_chunk[write_chunk_sz].r = prev_px.r + dr;
@@ -172,6 +177,6 @@ end_marker_check:
 	fclose(out);
 }
 
-void qoi_decode_rgb(char* in_path, char* out_path) {
+void qoi_decode_rgb (FILE* in, FILE* out) {
 
 }

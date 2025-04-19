@@ -64,7 +64,7 @@ void qoi_encode_rgba(char* in_path, char* out_path, uint32_t width, uint32_t hei
 				// encoded as 0b111110 and 0b111111 respectively, which would
 				// conflict with the 8-bit tag for RGB and RGBA sequences.
 				if (run == 62) {
-					write_chunk[write_chunk_sz++] = QOI_OP_RUN(run-1);
+					write_chunk[write_chunk_sz++] = qoi_op_run(run);
 					run = 0;
 				}
 			}
@@ -72,7 +72,7 @@ void qoi_encode_rgba(char* in_path, char* out_path, uint32_t width, uint32_t hei
 			// If the current pixel differs from the previous
 			else {
 				if (run > 0) {
-					write_chunk[write_chunk_sz++] = QOI_OP_RUN(run-1);
+					write_chunk[write_chunk_sz++] = qoi_op_run(run);
 					run = 0;
 
 					if (write_chunk_sz == MAX_CHUNK_SIZE) {
@@ -89,7 +89,7 @@ void qoi_encode_rgba(char* in_path, char* out_path, uint32_t width, uint32_t hei
 					seen_px[index].b == current_px.b &&
 					seen_px[index].a == current_px.a) {
 
-					write_chunk[write_chunk_sz++] = QOI_OP_INDEX(index);
+					write_chunk[write_chunk_sz++] = qoi_op_index(index);
 
 				} else {
 					seen_px[index] = current_px;
@@ -103,7 +103,7 @@ void qoi_encode_rgba(char* in_path, char* out_path, uint32_t width, uint32_t hei
 							dg >= -2 && dg <= 1 &&
 							db >= -2 && db <= 1) {
 							
-							write_chunk[write_chunk_sz++] = QOI_OP_DIFF(dr, dg, db);
+							write_chunk[write_chunk_sz++] = qoi_op_diff(dr, dg, db);
 						}
 		
 						// Try: LUMA encoding
@@ -117,7 +117,8 @@ void qoi_encode_rgba(char* in_path, char* out_path, uint32_t width, uint32_t hei
 								write_chunk_sz = 0;
 							}
 		
-							uint8_t bytes[] = QOI_OP_LUMA(dr, dg, db);
+							uint8_t bytes[2];
+							qoi_op_luma(dr, dg, db, bytes);
 							write_chunk[write_chunk_sz++] = bytes[0];
 							write_chunk[write_chunk_sz++] = bytes[1];
 						}
@@ -167,7 +168,7 @@ void qoi_encode_rgba(char* in_path, char* out_path, uint32_t width, uint32_t hei
 
 	// Write remaining run-length data if it exists
 	if (run > 0) {
-		uint8_t byte = QOI_OP_RUN(run-1);
+		uint8_t byte = qoi_op_run(run);
 		fwrite(&byte, 1, 1, out);
 	}
 
@@ -230,7 +231,7 @@ void qoi_encode_rgb(char* in_path, char* out_path, uint32_t width, uint32_t heig
 				// encoded as 0b111110 and 0b111111 respectively, which would
 				// conflict with the 8-bit tag for RGB and RGBA sequences.
 				if (run == 62) {
-					write_chunk[write_chunk_sz++] = QOI_OP_RUN(run-1);
+					write_chunk[write_chunk_sz++] = qoi_op_run(run);
 					run = 0;
 				}
 			}
@@ -238,7 +239,7 @@ void qoi_encode_rgb(char* in_path, char* out_path, uint32_t width, uint32_t heig
 			// If the current pixel differs from the previous
 			else {
 				if (run > 0) {
-					write_chunk[write_chunk_sz++] = QOI_OP_RUN(run-1);
+					write_chunk[write_chunk_sz++] = qoi_op_run(run);
 					run = 0;
 
 					if (write_chunk_sz == MAX_CHUNK_SIZE) {
@@ -255,7 +256,7 @@ void qoi_encode_rgb(char* in_path, char* out_path, uint32_t width, uint32_t heig
 					seen_px[index].g == current_px.g &&
 					seen_px[index].b == current_px.b) {
 
-					write_chunk[write_chunk_sz++] = QOI_OP_INDEX(index);
+					write_chunk[write_chunk_sz++] = qoi_op_index(index);
 
 				} else {
 					seen_px[index] = current_px;
@@ -268,7 +269,7 @@ void qoi_encode_rgb(char* in_path, char* out_path, uint32_t width, uint32_t heig
 						dg >= -2 && dg <= 1 &&
 						db >= -2 && db <= 1) {
 						
-						write_chunk[write_chunk_sz++] = QOI_OP_DIFF(dr, dg, db);
+						write_chunk[write_chunk_sz++] = qoi_op_diff(dr, dg, db);
 					}
 		
 					// Try: LUMA encoding
@@ -282,7 +283,8 @@ void qoi_encode_rgb(char* in_path, char* out_path, uint32_t width, uint32_t heig
 							write_chunk_sz = 0;
 						}
 		
-						uint8_t bytes[] = QOI_OP_LUMA(dr, dg, db);
+						uint8_t bytes[2];
+						qoi_op_luma(dr, dg, db, bytes);
 						write_chunk[write_chunk_sz++] = bytes[0];
 						write_chunk[write_chunk_sz++] = bytes[1];
 					}
@@ -316,7 +318,7 @@ void qoi_encode_rgb(char* in_path, char* out_path, uint32_t width, uint32_t heig
 
 	// Write remaining run-length data if it exists
 	if (run > 0) {
-		uint8_t byte = QOI_OP_RUN(run-1);
+		uint8_t byte = qoi_op_run(run);
 		fwrite(&byte, 1, 1, out);
 	}
 
