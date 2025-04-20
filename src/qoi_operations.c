@@ -13,7 +13,7 @@ uint8_t qoi_op_diff (int8_t dr, int8_t dg, int8_t db) {
 	);
 }
 
-void qoi_op_luma (int8_t dr, int8_t dg, int8_t db, uint8_t bytes[2]) {
+void qoi_op_luma (int8_t dr, int8_t dg, int8_t db, uint8_t bytes[static 2]) {
 	uint8_t dr_dg = dr - dg, db_dg = db - dg;
 
 	// dg is encoded with a bias of +32,

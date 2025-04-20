@@ -23,5 +23,5 @@
 
 uint8_t qoi_op_index (uint8_t i);
 uint8_t qoi_op_diff (int8_t dr, int8_t dg, int8_t db);
-void qoi_op_luma (int8_t dr, int8_t dg, int8_t db, uint8_t bytes[2]);
+void qoi_op_luma (int8_t dr, int8_t dg, int8_t db, uint8_t bytes[static 2]);
 uint8_t qoi_op_run (uint8_t run);
