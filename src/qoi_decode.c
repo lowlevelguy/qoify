@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/ucontext.h>
 
 #include "errmsg.h"
 #include "qoi_header.h"
@@ -33,6 +34,14 @@ void qoi_decode (char* in_path, char* out_path) {
 }
 
 void qoi_decode_rgba (FILE* in, FILE* out) {
+	fseek(in, sizeof(qoi_header), SEEK_SET);
+	if (ferror(in)) {
+		perror("qoi_decode::qoi_decode_rgba: Could not seek within file: ");
+		fclose(in);
+		fclose(out);
+		return;
+	}
+
 	uint8_t read_chunk[MAX_CHUNK_SIZE], dr, dg, db, dr_dg, db_dg;
 	rgba_t seen_px[64], write_chunk[MAX_CHUNK_SIZE], prev_px = QOI_COLOR_RGBA_BLACK;
 	size_t read_chunk_sz = 0, write_chunk_sz = 0, run_length = 0, index;
@@ -91,6 +100,13 @@ void qoi_decode_rgba (FILE* in, FILE* out) {
 				// Write to file if the buffer is too saturated
 				if (write_chunk_sz >= MAX_CHUNK_SIZE - run_length) {
 					fwrite(write_chunk, sizeof(rgba_t), write_chunk_sz, out);
+					if (ferror(out)) {
+						perror("qoi_decode::qoi_decode_rgba: Could not write to file: ");
+						fclose(in);
+						fclose(out);
+						return;
+					}
+
 					write_chunk_sz = 0;
 				}
 
@@ -151,19 +167,40 @@ void qoi_decode_rgba (FILE* in, FILE* out) {
 
 			if (write_chunk_sz == MAX_CHUNK_SIZE) {
 				fwrite(write_chunk, sizeof(rgba_t), MAX_CHUNK_SIZE, out);
+				if (ferror(out)) {
+					perror("qoi_decode::qoi_decode_rgba: Could not write to file: ");
+					fclose(in);
+					fclose(out);
+					return;
+				}
+
 				write_chunk_sz = 0;
 			}
 		}
 	}
 
+	if (ferror(in)) {
+		perror("qoi_decode::qoi_decode_rgba: Could not read from file: ");
+		fclose(in);
+		fclose(out);
+		return;
+	}
+
 end_marker_check:
 	// Seek to read exactly the last 8 bytes
 	fseek(in, -8, SEEK_END);
+	if (ferror(in)) {
+		perror("qoi_decode::qoi_decode_rgba: Could not seek within file: ");
+		fclose(in);
+		fclose(out);
+		return;
+	}
 
 	uint8_t end_marker[8] = {0}, bytes[8];
 	end_marker[7] = 1;
 
 	fread(bytes, 1, 8, in);
+
 	if (memcmp(end_marker, bytes, 8) != 0) {
 		fprintf(stderr, "Warning: Missing 8 byte marker. File may be corrupted.");
 	}
@@ -171,6 +208,8 @@ end_marker_check:
 
 	if (write_chunk_sz > 0) {
 		fwrite(write_chunk, sizeof(rgba_t), write_chunk_sz, out);
+		if (ferror(out))
+			perror("qoi_decode::qoi_decode_rgba: Could not write to file.");
 	}
 
 	fclose(in);
