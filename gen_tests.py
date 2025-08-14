@@ -3,11 +3,11 @@ import random
 
 ### Run-length encoding test
 # Pure black images
-open("test/rgba/black.rgba", "wb").write(b"\0\0\0\xFF" * 240000)
-open("test/rgb/black.rgb", "wb").write(b"\0\0\0" * 240000)
+open("test/raw/rgba/black.rgba", "wb").write(b"\0\0\0\xFF" * 240000)
+open("test/raw/rgb/black.rgb", "wb").write(b"\0\0\0" * 240000)
 # Pure red images
-open("test/rgba/red.rgba", "wb").write(b"\xFF\0\0\xFF" * 240000)
-open("test/rgb/red.rgb", "wb").write(b"\xFF\0\0" * 240000)
+open("test/raw/rgba/red.rgba", "wb").write(b"\xFF\0\0\xFF" * 240000)
+open("test/raw/rgb/red.rgb", "wb").write(b"\xFF\0\0" * 240000)
 
 ### Seen pixel encoding test
 # Exactly 64 repeating colors
@@ -23,8 +23,8 @@ for y in range(600):
         data_rgba.extend([r, g, b, 255])
         data_rgb.extend([r, g, b])
 
-open("test/rgba/seen64.rgba", "wb").write(bytes(data_rgba))
-open("test/rgb/seen64.rgb", "wb").write(bytes(data_rgb))
+open("test/raw/rgba/seen64.rgba", "wb").write(bytes(data_rgba))
+open("test/raw/rgb/seen64.rgb", "wb").write(bytes(data_rgb))
 
 # 16 repeating colors
 data_rgba = []
@@ -40,8 +40,8 @@ for y in range(600):
         data_rgba.extend([r, g, b, 255])
         data_rgb.extend([r, g, b])
 
-open("test/rgba/seen16.rgba", "wb").write(bytes(data_rgba))
-open("test/rgb/seen16.rgb", "wb").write(bytes(data_rgb))
+open("test/raw/rgba/seen16.rgba", "wb").write(bytes(data_rgba))
+open("test/raw/rgb/seen16.rgb", "wb").write(bytes(data_rgb))
 
 ### Diff encoding test
 # Random
@@ -60,8 +60,8 @@ for i in range(240000):
     data_rgba.extend([r, g, b, 255])
     data_rgb.extend([r, g, b])
 
-open("test/rgba/diff.rgba", "wb").write(bytes(data_rgba))
-open("test/rgb/diff.rgb", "wb").write(bytes(data_rgb))
+open("test/raw/rgba/diff.rgba", "wb").write(bytes(data_rgba))
+open("test/raw/rgb/diff.rgb", "wb").write(bytes(data_rgb))
 
 # Gradient
 data_rgba = []
@@ -77,8 +77,8 @@ for y in range(600):
         data_rgba.extend([r, g, b, 255])
         data_rgb.extend([r, g, b])
 
-open("test/rgba/gradient_diff.rgba", "wb").write(bytes(data_rgba))
-open("test/rgb/gradient_diff.rgb", "wb").write(bytes(data_rgb))
+open("test/raw/rgba/gradient_diff.rgba", "wb").write(bytes(data_rgba))
+open("test/raw/rgb/gradient_diff.rgb", "wb").write(bytes(data_rgb))
 
 ### Luma encoding test
 data_rgba = []
@@ -95,5 +95,5 @@ for i in range(240000):
     data_rgba.extend([r, g, b, 255])
     data_rgb.extend([r, g, b])
 
-open("test/rgba/luma.rgba", "wb").write(bytes(data_rgba))
-open("test/rgb/luma.rgb", "wb").write(bytes(data_rgb))
+open("test/raw/rgba/luma.rgba", "wb").write(bytes(data_rgba))
+open("test/raw/rgb/luma.rgb", "wb").write(bytes(data_rgb))

@@ -120,7 +120,7 @@ int main (int argc, char** argv) {
         if (width != -1 || height != -1 || !has_alpha) {
             fprintf(stderr, "Warning: Width, height, and alpha settings are ignored in decode mode\n");
         }
-        qoi_decode(input_file, output_file);
+        qoi_decode(input_file, output_file, has_alpha);
     }
 	
 	return 0;

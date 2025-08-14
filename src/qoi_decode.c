@@ -11,14 +11,25 @@
 
 #define MAX_CHUNK_SIZE 1024
 
-void qoi_decode (char* in_path, char* out_path) {
+void qoi_decode (char* in_path, char* out_path, int alpha) {
+	if (alpha)
+		qoi_decode_rgba(in_path, out_path);
+	else 
+		qoi_decode_rgb(in_path, out_path);
+}
+
+void qoi_decode_rgba (char* in_path, char* out_path) {
+	// Open files
 	FILE* in = fopen(in_path, "rb"), *out = fopen(out_path, "wb");
-	if (in == NULL || out == NULL) {
-		printf("Error occured when trying to open `%s` in read mode and/or `%s` in write mode.\n",
-				in_path, out_path);
+	if (in == NULL) {
+		printf("Error occured when trying to open `%s` in read mode.\n", in_path);
+		return;
+	} else if (out == NULL) {
+		printf("Error occured when trying to open `%s` in write mode.\n", out_path);
 		return;
 	}
 
+	// Read header
 	qoi_header qh;
 	int errcode;
 	if ((errcode = read_qoi_header(in, &qh)) < 0) {
@@ -26,28 +37,20 @@ void qoi_decode (char* in_path, char* out_path) {
 		return;
 	}
 
-	if (qh.channels == 4) {
-		qoi_decode_rgba(in, out);
-	} else {
-		qoi_decode_rgb(in, out);
-	}
-}
-
-void qoi_decode_rgba (FILE* in, FILE* out) {
-	fseek(in, sizeof(qoi_header), SEEK_SET);
-	if (ferror(in)) {
-		perror("qoi_decode::qoi_decode_rgba: Could not seek within file: ");
-		fclose(in);
-		fclose(out);
-		return;
-	}
-
+	// pixel_count: expected number of decoded pixels
+	// decoded_count: actual number of decoded pixels
+	uint64_t pixel_count = qh.width * qh.height, decoded_count = 0;
+	
 	uint8_t read_chunk[MAX_CHUNK_SIZE], dr, dg, db, dr_dg, db_dg;
 	rgba_t seen_px[64], write_chunk[MAX_CHUNK_SIZE], prev_px = QOI_COLOR_RGBA_BLACK;
 	size_t read_chunk_sz = 0, write_chunk_sz = 0, run_length = 0, index;
 
 	while ((read_chunk_sz = fread(read_chunk, 1, MAX_CHUNK_SIZE, in)) > 0) {
 		for (int i = 0; i < read_chunk_sz; i++) {
+			// Detect end-marker bytes
+//			if (decoded_count == pixel_count)
+//				goto end_marker_check; 
+
 			// To detect the end marker bytes, we need to detect two consecutive zero bytes.
 			// To avoid edge cases, whenever we detect a zero byte, we retreat the cursor.
 			//
@@ -58,7 +61,7 @@ void qoi_decode_rgba (FILE* in, FILE* out) {
 					fseek(in, -(read_chunk_sz - i), SEEK_CUR);
 					break;
 				}
-	
+			
 				// If we detect two consecutive zeroes, notice that only two possibilities
 				// exist that are specification-compliant: either it's the end marker bytes,
 				// or they are within an RGBA/RGB operation.
@@ -80,6 +83,7 @@ void qoi_decode_rgba (FILE* in, FILE* out) {
 
 				memcpy(&write_chunk[write_chunk_sz++], &read_chunk[i+1], sizeof(rgba_t));
 				i += sizeof(rgba_t);
+				decoded_count++;
 			}
 			
 			else if (read_chunk[i] == QOI_OP_RGB_TAG) {
@@ -92,6 +96,7 @@ void qoi_decode_rgba (FILE* in, FILE* out) {
 				memcpy(&write_chunk[write_chunk_sz], &read_chunk[i+1], sizeof(rgb_t));
 				write_chunk[write_chunk_sz++].a = prev_px.a;
 				i += sizeof(rgb_t);
+				decoded_count++;
 			}
 
 			else if ((read_chunk[i] & 0xc0) == QOI_OP_RUN_TAG) {
@@ -114,11 +119,13 @@ void qoi_decode_rgba (FILE* in, FILE* out) {
 					memcpy(&write_chunk[write_chunk_sz], &prev_px, sizeof(rgba_t));
 					write_chunk_sz++;
 				}
+				decoded_count += run_length;
 			}
 			
 			else if ((read_chunk[i] & 0xc0) == QOI_OP_INDEX_TAG) {
 				index = read_chunk[i] & 0x3f;
 				write_chunk[write_chunk_sz++] = seen_px[index];
+				decoded_count++;
 			}
 
 			else { 
@@ -146,7 +153,7 @@ void qoi_decode_rgba (FILE* in, FILE* out) {
 					// 	- 0xf0 = 0b11110000
 					// 	- 0x0f = 0b00001111
 					//
-					// The differences dr and db are with a bias of +8, while dg of +32.
+					// The differences dr_dg and db_dg are with a bias of +8, while dg of +32.
 					dg = (read_chunk[i++] & 0x3f) - 32;
 					dr_dg = ((read_chunk[i] & 0xf0) >> 4) - 8;
 					db_dg = (read_chunk[i] & 0x0f) - 8;
@@ -159,6 +166,7 @@ void qoi_decode_rgba (FILE* in, FILE* out) {
 				write_chunk[write_chunk_sz].g = prev_px.g + dg;
 				write_chunk[write_chunk_sz].b = prev_px.b + db;
 				write_chunk[write_chunk_sz++].a = prev_px.a;
+				decoded_count++;
 			}
 
 			prev_px = write_chunk[write_chunk_sz-1];
@@ -212,10 +220,19 @@ end_marker_check:
 			perror("qoi_decode::qoi_decode_rgba: Could not write to file.");
 	}
 
+	// Check expected vs decoded count for debugging
+	if (decoded_count == pixel_count) {
+		printf("Decoded pixels count as expected. All good.\n");
+	} else if (decoded_count < pixel_count) {
+		printf("Decoded pixels less than expected.\n");
+	} else if (decoded_count > pixel_count) {
+		printf("Decoded pixels more than expected.\n");
+	}
+
 	fclose(in);
 	fclose(out);
 }
 
-void qoi_decode_rgb (FILE* in, FILE* out) {
+void qoi_decode_rgb (char* in_path, char* out_path) {
 
 }

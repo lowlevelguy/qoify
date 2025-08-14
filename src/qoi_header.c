@@ -1,4 +1,5 @@
 #include <arpa/inet.h>
+#include <netinet/in.h>
 
 #include "qoi_header.h"
 
@@ -16,6 +17,9 @@ int read_qoi_header(FILE* f, qoi_header* qh) {
 	if (fread(&qh->width, 4, 1, f) == 0 || fread(&qh->height, 4, 1, f) == 0) {
 		return FILE_READ_ERROR;
 	}
+	// fix endianness
+	qh->width = ntohl(qh->width);
+	qh->height = ntohl(qh->height);
 
 	// get channels
 	uint8_t ch;

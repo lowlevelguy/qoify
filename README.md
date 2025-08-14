@@ -32,9 +32,27 @@ Note: RAW files must be uncompressed RGB/RGBA data
 ```
 
 ## Testing
-For now, since the decoder logic is not yet implemented, I test by viewing the input RAW and output QOI images in online viewers.
-Another possible way would be to use the encoder from the [official repo](https://github.com/phoboslab/qoi) and compare the hashes of its and my outputs.
+To generate the tests, run:
+```
+./gen_tests.py
+```
 
-Once the decoder logic is implemented though, it will be possible to simply encode then decode an image, and check that its unchanged.
+This will generate inside the directories `test/raw/rgb` and `test/raw/rgba` multiple raw image files targeted at testing each individual operation the codec is expected to perform:
+- `black.rgb(a),red.rgb(a)`: run-length encoding test
+- `seen16.rgb(a),seen64.rgb(a)`: seen/index encoding test
+- `diff.rgb(a),gradient_diff.rgb(a)`: DIFF encoding test
+- `luma.rgb(a)`: LUMA encoding test
 
-P.S. All tests currently included in the `test` directory are successful. 
+To encode the tests, run:
+```
+./test_enc.sh
+```
+
+This will generate, respectively, in the directories `test/encoded` and `test/qoi` the encoded QOI images yielded by my implementation and the official one. To verify our encoder is working correctly, we simply compare the hashes of the two versions.
+
+To then test the decoder, run:
+```
+./test_dec.sh
+```
+
+This will decode the images in `test/encoded` and save the output in `test/decoded`. You can then verify that the decoded pictures are identical to the original raws by comparing their hashes.
